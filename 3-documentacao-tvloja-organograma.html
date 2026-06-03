@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TVLoja - Organograma (Enxuto)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf9;
+    --white: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+    --orange: #ea580c;
+    --orange-light: #fff7ed;
+    --blue: #1d4ed8;
+    --blue-light: #eff6ff;
+    --green: #15803d;
+    --green-light: #f0fdf4;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --red: #b91c1c;
+    --red-light: #fef2f2;
+    --yellow: #a16207;
+    --yellow-light: #fefce8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: 1.5rem;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--orange);
+  }
+  .logo span { color: var(--text); }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+  }
+  nav a:hover { background: var(--bg); color: var(--text); }
+  .doc-badge {
+    background: var(--orange);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+  }
+  .page { max-width: 1600px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+  .hero {
+    background: linear-gradient(135deg, var(--orange) 0%, #c2410c 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 4rem;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+  }
+  .hero::before { content: 'TVLOJA'; position: absolute; right: -20px; top: -20px; font-family: 'Space Mono'; font-size: 8rem; font-weight: 700; opacity: 0.07; }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .hero h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.75rem; }
+  .hero p { opacity: 0.85; font-size: 0.92rem; max-width: 560px; }
+  .section-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.25rem; }
+  .section-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .divider { height: 1px; background: var(--border); margin: 3rem 0; }
+  .org-container { margin-bottom: 4rem; scroll-margin-top: 80px; }
+  .org-root { display: flex; justify-content: center; margin-bottom: 0; }
+  .root-node {
+    background: var(--orange);
+    color: #fff;
+    padding: 1.5rem 3rem;
+    border-radius: 16px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(234,88,12,0.3);
+  }
+  .root-node::after { content: ''; position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); width: 2px; height: 24px; background: var(--border); }
+  .root-label { font-family: 'Space Mono', monospace; font-size: 0.85rem; opacity: 0.8; }
+  .root-name { font-size: 1.4rem; font-weight: 800; }
+  .org-branch {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    margin-top: 0;
+  }
+  .branch-node {
+    width: 240px;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 2px solid;
+    text-align: center;
+  }
+  .bn-o { background: var(--orange-light); border-color: #fed7aa; }
+  .bn-b { background: var(--blue-light); border-color: #bfdbfe; }
+  .bn-g { background: var(--green-light); border-color: #bbf7d0; }
+  .bn-p { background: var(--purple-light); border-color: #ddd6fe; }
+  .bn-r { background: var(--red-light); border-color: #fecaca; }
+  .branch-icon { font-size: 1.2rem; margin-bottom: 0.3rem; }
+  .branch-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
+  .bn-o .branch-label { color: var(--orange); }
+  .branch-name { font-weight: 800; font-size: 0.88rem; color: var(--text); }
+  .org-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .org-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .org-card-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .org-card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .ic-o { background: var(--orange-light); }
+  .ic-b { background: var(--blue-light); }
+  .ic-g { background: var(--green-light); }
+  .ic-p { background: var(--purple-light); }
+  .org-card-title { font-weight: 800; font-size: 0.9rem; }
+  .org-card-body { padding: 1rem 1.25rem; }
+  .org-card-body ul { list-style: none; }
+  .org-card-body li {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+  .org-card-body li::before { content: '→'; color: var(--orange); }
+  .flow-vis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 2rem;
+  }
+  .fv-step {
+    flex: 1;
+    min-width: 120px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 1rem;
+    text-align: center;
+  }
+  .fv-step:first-child { border-radius: 12px 0 0 12px; }
+  .fv-step:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
+  .fv-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  .fv-label { font-weight: 700; font-size: 0.78rem; }
+  .fv-sub { font-size: 0.68rem; color: var(--muted); }
+  .perm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-bottom: 2rem;
+  }
+  .perm-table th {
+    background: var(--bg);
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .perm-table th:first-child { text-align: left; }
+  .perm-table td {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    text-align: center;
+    background: var(--white);
+  }
+  .perm-table td:first-child { text-align: left; font-weight: 600; }
+  .yes { color: #15803d; font-weight: 700; }
+  .no { color: #9ca3af; }
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .tech-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .tech-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; background: var(--blue-light); }
+  .tech-name { font-weight: 700; font-size: 0.82rem; }
+  .tech-role { font-size: 0.7rem; color: var(--muted); }
+  @media (max-width: 768px) {
+    .page { padding: 1.5rem; }
+    .hero { padding: 1.5rem; }
+    .hero h1 { font-size: 1.4rem; }
+    nav { display: none; }
+    .org-branch { gap: 1rem; }
+    .branch-node { width: 100%; max-width: 280px; }
+    .fv-step { border-right: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem; }
+    .fv-step:first-child { border-radius: 8px; }
+    .fv-step:last-child { border-radius: 8px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo">TV<span>Loja</span></div>
+    <nav><a href="#organograma">Organograma</a><a href="#admin-tree">Admin</a><a href="#flow">Fluxos</a><a href="#permissoes">Permissões</a><a href="#tech">Tecnologia</a></nav>
+    <div class="doc-badge">DOC 3 · Organograma</div>
+  </div>
+</header>
+<div class="page">
+  <div class="hero"><div class="hero-tag">// DOC_3 · organograma_essencial</div><h1>Estrutura e Fluxos<br>TVLoja SaaS</h1><p>Organograma focado em: administração, cliente, site único, assinaturas, notificações e integração com Mercado Pago + API de domínios.</p></div>
+  <div class="org-container" id="organograma">
+    <div class="org-root"><div class="root-node"><div class="root-label">SAAS PLATFORM</div><div class="root-name">TVLoja</div></div></div>
+    <div class="org-branch">
+      <div class="branch-node bn-o"><div class="branch-icon">⚙️</div><div class="branch-label">Módulo</div><div class="branch-name">Painel Administrativo</div></div>
+      <div class="branch-node bn-b"><div class="branch-icon">👤</div><div class="branch-label">Módulo</div><div class="branch-name">Painel do Cliente</div></div>
+      <div class="branch-node bn-g"><div class="branch-icon">🌐</div><div class="branch-label">Módulo</div><div class="branch-name">Site Público (Vitrine/Landing)</div></div>
+      <div class="branch-node bn-p"><div class="branch-icon">💰</div><div class="branch-label">Módulo</div><div class="branch-name">Assinaturas & Faturas</div></div>
+      <div class="branch-node bn-r"><div class="branch-icon">🔔</div><div class="branch-label">Módulo</div><div class="branch-name">Notificações (E-mail/WhatsApp)</div></div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="org-container" id="admin-tree">
+    <div class="section-title">Painel Administrativo</div>
+    <div class="section-sub">Módulos internos para gestão do SaaS</div>
+    <div class="org-grid">
+      <div class="org-card"><div class="org-card-header"><div class="org-card-icon ic-o">📊</div><div class="org-card-title">Dashboard</div></div><div class="org-card-body"><ul><li>KPIs: clientes ativos, MRR, churn</li><li>Gráficos de evolução e receita</li><li>Alertas de cobranças vencidas</li><li>Atividades recentes</li></ul></div></div>
+      <div class="org-card"><div class="org-card-header"><div class="org-card-icon ic-b">👥</div><div class="org-card-title">Gestão de Clientes</div></div><div class="org-card-body"><ul><li>Lista com busca e filtros</li><li>Perfil do cliente (dados, plano, histórico)</li><li>Bloquear/desbloquear/cancelar</li><li>Troca de plano manual</li><li>Notas internas</li></ul></div></div>
+      <div class="org-card"><div class="org-card-header"><div class="org-card-icon ic-p">💰</div><div class="org-card-title">Financeiro</div></div><div class="org-card-body"><ul><li>Todas as faturas do sistema</li><li>Baixa manual e via webhook Mercado Pago</li><li>Relatório de receita e inadimplência</li><li>Régua de cobrança configurável</li><li>Exportação CSV/PDF</li></ul></div></div>
+      <div class="org-card"><div class="org-card-header"><div class="org-card-icon ic-g">🌐</div><div class="org-card-title">Domínios</div></div><div class="org-card-body"><ul><li>Lista de domínios próprios e subdomínios</li><li>Status DNS e SSL</li><li>Forçar verificação manual</li><li>Alertas de expiração</li></ul></div></div>
+      <div class="org-card"><div class="org-card-header"><div class="org-card-icon ic-g">⚙️</div><div class="org-card-title">Configurações</div></div><div class="org-card-body"><ul><li>Chaves Mercado Pago</li><li>API WhatsApp e E-mail (SMTP/SendGrid)</li><li>API de Domínio (registrador)</li><li>Parâmetros de cobrança (multa, juros, carência)</li><li>Planos e preços</li><li>Usuários admin</li></ul></div></div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="org-container" id="flow">
+    <div class="section-title">Fluxos Essenciais</div>
+    <div class="section-sub">Cadastro, domínio próprio e régua de cobrança</div>
+    <div style="margin-bottom: 2rem;"><div class="section-title" style="font-size: 0.9rem;">📝 Cadastro & Onboarding</div><div class="flow-vis"><div class="fv-step"><div class="fv-num">1</div><div class="fv-label">Acessa site</div><div class="fv-sub">tvloja.com.br</div></div><div class="fv-step"><div class="fv-num">2</div><div class="fv-label">Escolhe subdomínio</div><div class="fv-sub">Verifica disponibilidade</div></div><div class="fv-step"><div class="fv-num">3</div><div class="fv-label">Preenche dados</div><div class="fv-sub">Nome, e-mail, WhatsApp</div></div><div class="fv-step"><div class="fv-num">4</div><div class="fv-label">Cria conta</div><div class="fv-sub">Boas-vindas automático</div></div><div class="fv-step"><div class="fv-num">5</div><div class="fv-label">Onboarding</div><div class="fv-sub">Logo, cores, info</div></div><div class="fv-step"><div class="fv-num">6</div><div class="fv-label">Preview</div><div class="fv-sub">Site gerado</div></div><div class="fv-step"><div class="fv-num">7</div><div class="fv-label">Publicado!</div><div class="fv-sub">subdominio.tvloja.com.br</div></div></div></div>
+    <div style="margin-bottom: 2rem;"><div class="section-title" style="font-size: 0.9rem;">🌐 Domínio Próprio (compra/consulta via API)</div><div class="flow-vis"><div class="fv-step"><div class="fv-num">1</div><div class="fv-label">Digita domínio</div><div class="fv-sub">API consulta disponibilidade</div></div><div class="fv-step"><div class="fv-num">2</div><div class="fv-label">Compra pelo painel</div><div class="fv-sub">Integração com registrador</div></div><div class="fv-step"><div class="fv-num">3</div><div class="fv-label">DNS configurado</div><div class="fv-sub">Automático</div></div><div class="fv-step"><div class="fv-num">4</div><div class="fv-label">Propagação</div><div class="fv-sub">Verificação a cada hora</div></div><div class="fv-step"><div class="fv-num">5</div><div class="fv-label">SSL emitido</div><div class="fv-sub">Let's Encrypt</div></div><div class="fv-step"><div class="fv-num">6</div><div class="fv-label">Ativo</div><div class="fv-sub">Notificação ao cliente</div></div></div></div>
+    <div><div class="section-title" style="font-size: 0.9rem;">💳 Régua de Cobrança (Mercado Pago)</div><div class="flow-vis"><div class="fv-step"><div class="fv-num">D0</div><div class="fv-label">Fatura gerada</div><div class="fv-sub">E-mail + WhatsApp</div></div><div class="fv-step"><div class="fv-num">D-3</div><div class="fv-label">Lembrete</div><div class="fv-sub">WhatsApp</div></div><div class="fv-step"><div class="fv-num">Venc.</div><div class="fv-label">Vencimento</div><div class="fv-sub">Link pagamento</div></div><div class="fv-step"><div class="fv-num">D+1</div><div class="fv-label">Atraso</div><div class="fv-sub">Multa+Juros</div></div><div class="fv-step"><div class="fv-num">D+5</div><div class="fv-label">Alerta bloqueio</div><div class="fv-sub">Aviso final</div></div><div class="fv-step"><div class="fv-num">D+10</div><div class="fv-label">Bloqueio</div><div class="fv-sub">Site/painel bloqueados</div></div><div class="fv-step"><div class="fv-num">✓</div><div class="fv-label">Pagamento</div><div class="fv-sub">Desbloqueio imediato</div></div></div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="org-container" id="permissoes">
+    <div class="section-title">Matriz de Permissões</div>
+    <div class="section-sub">Perfis e acessos</div>
+    <table class="perm-table">
+      <thead><tr><th>Recurso / Ação</th><th>Super Admin</th><th>Admin</th><th>Financeiro</th><th>Cliente (Owner)</th><th>Cliente (User)</th></tr></thead>
+      <tbody>
+        <tr><td>Dashboard admin</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Gestão de clientes (CRUD)</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Bloquear / cancelar cliente</td><td class="yes">✓</td><td class="yes">✓</td><td class="part">bloquear</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Financeiro (faturas, baixas)</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Configurações sistema</td><td class="yes">✓</td><td class="part">limitado</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+        <tr><td>Editar meu site</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="part">limitado</td></tr>
+        <tr><td>Configurar/comprar domínio</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td></tr>
+        <tr><td>Ver minhas faturas</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Gerenciar produtos (vitrine)</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="part">limitado</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="divider"></div>
+  <div class="org-container" id="tech">
+    <div class="section-title">Stack Tecnológica (Enxuta)</div>
+    <div class="section-sub">Tecnologias utilizadas no projeto</div>
+    <div class="tech-grid">
+      <div class="tech-card"><div class="tech-icon">📱</div><div><div class="tech-name">React Native / Expo</div><div class="tech-role">App mobile (painel cliente)</div></div></div>
+      <div class="tech-card"><div class="tech-icon">⚛️</div><div><div class="tech-name">Next.js 14</div><div class="tech-role">Admin web + site público</div></div></div>
+      <div class="tech-card"><div class="tech-icon">🟢</div><div><div class="tech-name">Node.js + Fastify</div><div class="tech-role">API REST</div></div></div>
+      <div class="tech-card"><div class="tech-icon">🐘</div><div><div class="tech-name">PostgreSQL</div><div class="tech-role">Banco de dados</div></div></div>
+      <div class="tech-card"><div class="tech-icon">⚡</div><div><div class="tech-name">Redis + Bull</div><div class="tech-role">Cache e filas</div></div></div>
+      <div class="tech-card"><div class="tech-icon">☁️</div><div><div class="tech-name">S3 / MinIO</div><div class="tech-role">Storage imagens</div></div></div>
+      <div class="tech-card"><div class="tech-icon">💳</div><div><div class="tech-name">Mercado Pago</div><div class="tech-role">Gateway de pagamento</div></div></div>
+      <div class="tech-card"><div class="tech-icon">💬</div><div><div class="tech-name">WhatsApp API</div><div class="tech-role">Notificações</div></div></div>
+      <div class="tech-card"><div class="tech-icon">📧</div><div><div class="tech-name">SendGrid / SMTP</div><div class="tech-role">E-mail transacional</div></div></div>
+      <div class="tech-card"><div class="tech-icon">🌐</div><div><div class="tech-name">API Domínio (Registrador)</div><div class="tech-role">Consulta/compra domínio</div></div></div>
+      <div class="tech-card"><div class="tech-icon">🔒</div><div><div class="tech-name">Let's Encrypt</div><div class="tech-role">SSL automático</div></div></div>
+      <div class="tech-card"><div class="tech-icon">🐳</div><div><div class="tech-name">Docker</div><div class="tech-role">Containerização</div></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

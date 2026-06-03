@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TVLoja - Funcionalidades (Enxuto)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #f97316;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #a855f7;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --heading: #f8fafc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  header {
+    background: linear-gradient(135deg, #0d1525 0%, #111827 50%, #0f1e35 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 2rem;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--text); }
+  nav {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  nav a:hover { background: var(--surface2); color: var(--text); }
+  .doc-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-family: 'Syne', sans-serif;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 64px);
+  }
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 2rem 1rem;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-track { background: transparent; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-section { margin-bottom: 2rem; }
+  .sidebar-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    padding: 0 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.83rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: var(--surface2); color: var(--accent); }
+  .sidebar-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  main {
+    padding: 3rem 3rem 6rem;
+    overflow: hidden;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.3);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .hero p { color: var(--muted); max-width: 600px; font-size: 0.95rem; }
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .hero-stat .val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .hero-stat .lbl { font-size: 0.75rem; color: var(--muted); }
+  section { margin-bottom: 4rem; scroll-margin-top: 80px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .icon-orange { background: rgba(249,115,22,0.15); }
+  .icon-blue { background: rgba(59,130,246,0.15); }
+  .icon-green { background: rgba(16,185,129,0.15); }
+  .icon-purple { background: rgba(168,85,247,0.15); }
+  .icon-red { background: rgba(239,68,68,0.15); }
+  .icon-yellow { background: rgba(234,179,8,0.15); }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--heading);
+  }
+  .section-sub { font-size: 0.8rem; color: var(--muted); }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--heading);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .card ul li {
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .card ul li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    font-size: 0.75rem;
+  }
+  .feat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin-bottom: 1.5rem;
+  }
+  .feat-table th {
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .feat-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-orange { background: rgba(249,115,22,0.15); color: #fb923c; }
+  .badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .badge-green { background: rgba(16,185,129,0.15); color: #34d399; }
+  .badge-purple { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.25rem;
+    position: relative;
+  }
+  .plan-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(249,115,22,0.05) 100%);
+  }
+  .plan-featured-badge {
+    position: absolute;
+    top: -10px; right: 1rem;
+    background: var(--accent);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Syne', sans-serif;
+  }
+  .plan-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--heading);
+    margin-bottom: 0.25rem;
+  }
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 0.5rem 0;
+  }
+  .plan-price span { font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+  .plan-desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+  .plan-features li {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .plan-features li::before { content: '✓'; color: var(--accent3); flex-shrink: 0; }
+  .module {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .module-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--heading);
+  }
+  .module-body { padding: 1.25rem; }
+  .module-body ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.4rem;
+  }
+  .module-body ul li {
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .module-body ul li::before {
+    content: '▸';
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 120px;
+    flex: 1;
+  }
+  .flow-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .flow-label {
+    font-size: 0.75rem;
+    color: var(--text);
+    text-align: center;
+    font-weight: 500;
+  }
+  .flow-arrow {
+    color: var(--border);
+    font-size: 1.2rem;
+    padding-top: 0.5rem;
+    flex-shrink: 0;
+  }
+  .info-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
+  .info-box.warning { border-left-color: var(--accent); }
+  .info-box.success { border-left-color: var(--accent3); }
+  .info-box strong { color: var(--text); }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    main { padding: 1.5rem; }
+    .hero { padding: 1.5rem; }
+    .hero h1 { font-size: 1.5rem; }
+    .header-inner { flex-wrap: wrap; height: auto; padding: 0.75rem 0; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="logo">TV<span>Loja</span></div>
+    <nav>
+      <a href="#admin">Admin</a>
+      <a href="#usuario">Usuário</a>
+      <a href="#sites">Site</a>
+      <a href="#financeiro">Financeiro</a>
+      <a href="#dominio">Domínio</a>
+    </nav>
+    <div class="doc-badge">DOC 1 · Funcionalidades</div>
+  </div>
+</header>
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Visão Geral</div>
+      <a href="#overview" class="sidebar-item active"><div class="sidebar-dot"></div> Sobre o Sistema</a>
+      <a href="#planos" class="sidebar-item"><div class="sidebar-dot"></div> Planos</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Painel Admin</div>
+      <a href="#admin-dashboard" class="sidebar-item"><div class="sidebar-dot"></div> Dashboard</a>
+      <a href="#admin-clientes" class="sidebar-item"><div class="sidebar-dot"></div> Gestão de Clientes</a>
+      <a href="#admin-financeiro" class="sidebar-item"><div class="sidebar-dot"></div> Financeiro</a>
+      <a href="#admin-config" class="sidebar-item"><div class="sidebar-dot"></div> Configurações</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Painel do Usuário</div>
+      <a href="#user-dashboard" class="sidebar-item"><div class="sidebar-dot"></div> Dashboard</a>
+      <a href="#user-site" class="sidebar-item"><div class="sidebar-dot"></div> Meu Site</a>
+      <a href="#user-dominio" class="sidebar-item"><div class="sidebar-dot"></div> Domínio</a>
+      <a href="#user-financeiro" class="sidebar-item"><div class="sidebar-dot"></div> Financeiro</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Site</div>
+      <a href="#site-unico" class="sidebar-item"><div class="sidebar-dot"></div> Site Único (Vitrine/Landing)</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Notificações</div>
+      <a href="#notificacoes" class="sidebar-item"><div class="sidebar-dot"></div> E-mail + WhatsApp</a>
+    </div>
+  </aside>
+  <main>
+    <div class="hero" id="overview">
+      <div class="hero-tag">📄 Documentação 1 de 3</div>
+      <h1>TVLoja · Funcionalidades Essenciais</h1>
+      <p>Sistema SaaS para criação de sites/vitrine com gestão de assinaturas, integração Mercado Pago, API de domínios e notificações automáticas.</p>
+      <div class="hero-meta">
+        <div class="hero-stat"><div class="val">1</div><div class="lbl">Tipo de Site</div></div>
+        <div class="hero-stat"><div class="val">3</div><div class="lbl">Planos</div></div>
+        <div class="hero-stat"><div class="val">2</div><div class="lbl">Canais Notificação</div></div>
+        <div class="hero-stat"><div class="val">✓</div><div class="lbl">Domínio próprio</div></div>
+      </div>
+    </div>
+    <section id="planos">
+      <div class="section-header">
+        <div class="section-icon icon-orange">🏷️</div>
+        <div><div class="section-title">Planos de Assinatura</div><div class="section-sub">Mensalidades administrativas – sem venda de produtos no site</div></div>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">R$0<span>/mês</span></div>
+          <div class="plan-desc">Subdomínio gratuito, site básico com seções limitadas.</div>
+          <ul class="plan-features"><li>Subdomínio .tvloja.com.br</li><li>Máx. 5 seções</li><li>Logo e cores básicas</li><li>Marca TVLoja no rodapé</li></ul>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-featured-badge">POPULAR</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">R$49<span>/mês</span></div>
+          <div class="plan-desc">Site completo, domínio próprio, sem anúncios.</div>
+          <ul class="plan-features"><li>Subdomínio ou domínio próprio</li><li>Seções ilimitadas</li><li>Remoção da marca TVLoja</li><li>Suporte prioritário</li></ul>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Business</div>
+          <div class="plan-price">R$99<span>/mês</span></div>
+          <div class="plan-desc">Recursos avançados, múltiplos usuários, API de domínio.</div>
+          <ul class="plan-features"><li>Tudo do Pro</li><li>Compra/consulta domínio via API</li><li>Até 5 usuários no painel</li><li>Relatórios financeiros</li></ul>
+        </div>
+      </div>
+      <div class="info-box"><strong>Regra:</strong> O site pode ser configurado como vitrine, landing page ou institucional – sempre sem funcionalidade de venda (apenas exibição + botão WhatsApp).</div>
+    </section>
+    <section id="admin-dashboard">
+      <div class="section-header"><div class="section-icon icon-orange">⚡</div><div><div class="section-title">Admin · Dashboard Principal</div><div class="section-sub">Visão geral do sistema</div></div></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-title">📊 KPIs</div><ul><li>Total de clientes</li><li>Ativos / Bloqueados</li><li>MRR (receita recorrente)</li><li>Churn rate</li><li>Faturas pendentes/vencidas</li></ul></div>
+        <div class="card"><div class="card-title">📈 Gráficos</div><ul><li>Evolução de clientes</li><li>Receita por plano</li><li>Inadimplência mensal</li><li>Domínios ativos vs subdomínios</li></ul></div>
+        <div class="card"><div class="card-title">🚨 Alertas</div><ul><li>Cobranças vencidas</li><li>Domínios prestes a expirar</li><li>Falha em notificações</li><li>Bloqueio automático iminente</li></ul></div>
+      </div>
+    </section>
+    <section id="admin-clientes">
+      <div class="section-header"><div class="section-icon icon-blue">👥</div><div><div class="section-title">Admin · Gestão de Clientes</div><div class="section-sub">CRUD completo</div></div></div>
+      <div class="module"><div class="module-header"><span>📋</span><div class="module-title">Listagem e ações</div></div><div class="module-body"><ul><li>Nome/Razão Social, CNPJ/CPF</li><li>Subdomínio e domínio próprio</li><li>Plano atual e status</li><li>Filtros por status, plano, inadimplência</li><li>Bloquear, desbloquear, cancelar</li><li>Trocar plano manualmente</li><li>Enviar notificação (WhatsApp/E-mail)</li><li>Notas internas</li></ul></div></div>
+    </section>
+    <section id="admin-financeiro">
+      <div class="section-header"><div class="section-icon icon-green">💰</div><div><div class="section-title">Admin · Financeiro</div><div class="section-sub">Cobranças de assinatura</div></div></div>
+      <div class="module"><div class="module-header"><span>📑</span><div class="module-title">Módulos financeiros</div></div><div class="module-body"><ul><li>Geração automática de faturas mensais</li><li>Vencimento configurável por cliente</li><li>Multa e juros automáticos após vencimento</li><li>Régua de cobrança (lembretes, bloqueio)</li><li>Baixa manual e via webhook Mercado Pago</li><li>Relatório de receita / inadimplência</li><li>Exportação CSV/PDF</li></ul></div></div>
+      <table class="feat-table"><thead><tr><th>Evento</th><th>Gatilho</th><th>Ação Automática</th></tr></thead><tbody><tr><td>Fatura gerada</td><td>Dia do vencimento -7</td><td>Notificação por e-mail + WhatsApp</td></tr><tr><td>Lembrete D-3</td><td>3 dias antes</td><td>WhatsApp de lembrete</td></tr><tr><td>Vencimento D+1</td><td>1 dia após</td><td>Aviso de atraso + link de pagamento</td></tr><tr><td>Alerta bloqueio D+5</td><td>5 dias após</td><td>Aviso de bloqueio iminente</td></tr><tr><td>Bloqueio automático D+10</td><td>10 dias após</td><td>Site e painel bloqueados</td></tr><tr><td>Pagamento confirmado</td><td>Webhook Mercado Pago</td><td>Desbloqueio + confirmação</td></tr></tbody></table>
+    </section>
+    <section id="admin-config">
+      <div class="section-header"><div class="section-icon icon-yellow">⚙️</div><div><div class="section-title">Configurações do Sistema</div><div class="section-sub">Parâmetros globais</div></div></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-title">🔧 Gerais</div><ul><li>Nome/logo do sistema</li><li>Domínio base (tvloja.com.br)</li><li>Dias de carência, multa e juros</li><li>Período de retenção de dados</li></ul></div>
+        <div class="card"><div class="card-title">💳 Mercado Pago</div><ul><li>Access Token (produção/sandbox)</li><li>Webhook configurado</li><li>Métodos: PIX, boleto, cartão</li></ul></div>
+        <div class="card"><div class="card-title">📱 Notificações</div><ul><li>API WhatsApp (Evolution/Z-API)</li><li>Configuração SMTP / SendGrid</li><li>Templates de e-mail e WhatsApp</li></ul></div>
+        <div class="card"><div class="card-title">🌐 API de Domínio</div><ul><li>Integração com registrador (ex: GoDaddy, Namecheap, registro.br)</li><li>Consultar disponibilidade</li><li>Comprar domínio automaticamente</li><li>Configurar DNS automático</li></ul></div>
+        <div class="card"><div class="card-title">👤 Usuários Admin</div><ul><li>Criação de admins</li><li>Perfis: super admin, financeiro, suporte</li><li>Log de ações</li></ul></div>
+      </div>
+    </section>
+    <section id="user-dashboard">
+      <div class="section-header"><div class="section-icon icon-blue">🖥️</div><div><div class="section-title">Painel do Usuário · Dashboard</div><div class="section-sub">Visão personalizada</div></div></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-title">📊 Resumo</div><ul><li>Status da conta</li><li>Plano atual e renovação</li><li>Site ativo (domínio/subdomínio)</li><li>Próxima cobrança</li><li>Notificações não lidas</li></ul></div>
+        <div class="card"><div class="card-title">⚡ Ações rápidas</div><ul><li>Editar meu site</li><li>Configurar/comprar domínio</li><li>Ver faturas em aberto</li><li>Upgrade de plano</li></ul></div>
+      </div>
+    </section>
+    <section id="user-site">
+      <div class="section-header"><div class="section-icon icon-orange">🎨</div><div><div class="section-title">Meu Site</div><div class="section-sub">Editor visual único (vitrine/landing/institucional)</div></div></div>
+      <div class="module"><div class="module-header"><span>🎨</span><div class="module-title">Editor de conteúdo</div></div><div class="module-body"><ul><li>Escolha do layout: Vitrine (catálogo), Landing Page ou Site Institucional</li><li>Upload de logo, favicon</li><li>Cores e fontes personalizáveis</li><li>Seções arrastar/soltar</li><li>Upload de imagens e galeria</li><li>Vídeos (YouTube/Vimeo)</li><li>Formulário de contato</li><li>Botão WhatsApp flutuante</li><li>Redes sociais</li><li>Preview mobile/desktop</li><li>Publicar / rascunho</li></ul></div></div>
+      <div class="module"><div class="module-header"><span>🛍️</span><div class="module-title">Módulo Vitrine (catálogo)</div></div><div class="module-body"><ul><li>Cadastro de produtos (nome, descrição, imagens)</li><li>Categorias simples</li><li>Produtos em destaque</li><li>Filtro por categoria no site</li><li>Botão "Solicitar via WhatsApp" – sem carrinho ou checkout</li></ul></div></div>
+    </section>
+    <section id="user-dominio">
+      <div class="section-header"><div class="section-icon icon-green">🌐</div><div><div class="section-title">Domínio Próprio</div><div class="section-sub">Consulta e compra via API integrada</div></div></div>
+      <div class="flow"><div class="flow-step"><div class="flow-num">1</div><div class="flow-label">Cliente digita domínio desejado</div></div><div class="flow-arrow">›</div><div class="flow-step"><div class="flow-num">2</div><div class="flow-label">API consulta disponibilidade</div></div><div class="flow-arrow">›</div><div class="flow-step"><div class="flow-num">3</div><div class="flow-label">Compra pelo painel (se disponível)</div></div><div class="flow-arrow">›</div><div class="flow-step"><div class="flow-num">4</div><div class="flow-label">Configuração DNS automática</div></div><div class="flow-arrow">›</div><div class="flow-step"><div class="flow-num">5</div><div class="flow-label">SSL emitido (Let's Encrypt)</div></div><div class="flow-arrow">›</div><div class="flow-step"><div class="flow-num">6</div><div class="flow-label">Domínio ativo ✓</div></div></div>
+      <div class="info-box success"><strong>Automação:</strong> O sistema verifica DNS a cada hora. Detectada a propagação, SSL é emitido automaticamente via Let's Encrypt. Cliente pode também apontar domínio externo seguindo instruções.</div>
+    </section>
+    <section id="user-financeiro">
+      <div class="section-header"><div class="section-icon icon-green">💳</div><div><div class="section-title">Minhas Faturas</div><div class="section-sub">Histórico e pagamento</div></div></div>
+      <div class="cards-grid"><div class="card"><div class="card-title">📄 Cobranças</div><ul><li>Lista de faturas com status</li><li>Link de pagamento (PIX/boleto/cartão)</li><li>Baixar boleto/QR PIX</li><li>Histórico de pagamentos</li><li>Recibo digital</li></ul></div><div class="card"><div class="card-title">⬆️ Upgrade de plano</div><ul><li>Comparativo de planos</li><li>Cobrança proporcional</li><li>Ativação imediata após confirmação</li></ul></div></div>
+    </section>
+    <section id="notificacoes">
+      <div class="section-header"><div class="section-icon icon-blue">🔔</div><div><div class="section-title">Notificações</div><div class="section-sub">E-mail e WhatsApp</div></div></div>
+      <table class="feat-table"><thead><tr><th>Evento</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody><tr><td>Cadastro realizado</td><td>✅</td><td>✅</td></tr><tr><td>Boas-vindas</td><td>✅</td><td>✅</td></tr><tr><td>Fatura gerada</td><td>✅</td><td>✅</td></tr><tr><td>Lembrete vencimento</td><td>✅</td><td>❌</td></tr><tr><td>Atraso D+1</td><td>✅</td><td>✅</td></tr><tr><td>Alerta bloqueio D+5</td><td>✅</td><td>✅</td></tr><tr><td>Conta bloqueada</td><td>✅</td><td>✅</td></tr><tr><td>Pagamento confirmado</td><td>✅</td><td>✅</td></tr><tr><td>Domínio configurado</td><td>❌</td><td>✅</td></tr><tr><td>Domínio expirando</td><td>✅</td><td>✅</td></tr></tbody></table>
+    </section>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TVLoja - Banco de Dados (Simplificado)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #f8fafc;
+    --border: #e2e8f0;
+    --accent: #1e40af;
+    --accent2: #0ea5e9;
+    --accent3: #059669;
+    --accent4: #7c3aed;
+    --accent5: #dc2626;
+    --accent6: #d97706;
+    --text: #1e293b;
+    --muted: #64748b;
+    --heading: #0f172a;
+    --code-bg: #1e293b;
+    --code-text: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  header {
+    background: var(--heading);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: 2rem;
+  }
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #60a5fa;
+  }
+  .logo span { color: #fff; }
+  nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+  nav a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.3rem 0.7rem;
+    border-radius: 5px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  nav a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .doc-badge {
+    background: #1e40af;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  aside {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-section { margin-bottom: 1.5rem; }
+  .sidebar-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    padding: 0 0.5rem;
+    margin-bottom: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .sidebar-item:hover, .sidebar-item.active { background: #eff6ff; color: var(--accent); font-weight: 600; }
+  main { padding: 2.5rem 3rem 6rem; }
+  .hero {
+    background: var(--heading);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; top: 0; right: 0; width: 300px; height: 100%; background: linear-gradient(90deg, transparent, rgba(30,64,175,0.4)); }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(96,165,250,0.15);
+    border: 1px solid rgba(96,165,250,0.3);
+    color: #60a5fa;
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hero h1 { font-size: 1.9rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+  .hero p { color: #94a3b8; font-size: 0.9rem; max-width: 500px; }
+  .hero-chips { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .hero-chip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+    font-size: 0.73rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  section { margin-bottom: 4rem; scroll-margin-top: 80px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+  .section-title { font-size: 1.25rem; font-weight: 700; color: var(--heading); }
+  .table-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .table-block-header { padding: 1rem 1.25rem; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+  .table-name { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+  .t { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .t th { background: var(--surface2); color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; }
+  .t td { padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  .t tr:last-child td { border-bottom: none; }
+  .t td:first-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--accent); font-size: 0.78rem; }
+  .t td:nth-child(2) { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-size: 0.75rem; }
+  .b { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 3px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+  .b-pk { background: #fef3c7; color: #92400e; }
+  .b-fk { background: #dbeafe; color: #1e40af; }
+  .b-uq { background: #f0fdf4; color: #15803d; }
+  .code-block { background: var(--code-bg); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.8; color: var(--code-text); }
+  .code-comment { color: #64748b; }
+  .rel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+  .rel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .rel-title { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+  .rel-arrow { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 0.3rem; }
+  .rel-type { background: #eff6ff; color: var(--accent); font-size: 0.6rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 3px; margin-left: auto; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    main { padding: 1.5rem; }
+    .hero { padding: 1.5rem; }
+    .hero h1 { font-size: 1.4rem; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo"><span>TV</span>Loja<span style="color:#334155">.</span>db</div><nav><a href="#tabelas">Tabelas</a><a href="#relacionamentos">Relacionamentos</a></nav><div class="doc-badge">DOC 2 · DB (Simplificado)</div></div></header>
+<div class="layout">
+  <aside><div class="sidebar-section"><div class="sidebar-label">Tabelas</div><a href="#tenants" class="sidebar-item">tenants</a><a href="#users" class="sidebar-item">users</a><a href="#domains" class="sidebar-item">domains</a><a href="#sites" class="sidebar-item">sites</a><a href="#site_sections" class="sidebar-item">site_sections</a><a href="#products" class="sidebar-item">products</a><a href="#plans" class="sidebar-item">plans</a><a href="#subscriptions" class="sidebar-item">subscriptions</a><a href="#invoices" class="sidebar-item">invoices</a><a href="#payments" class="sidebar-item">payments</a><a href="#notifications" class="sidebar-item">notifications</a><a href="#settings" class="sidebar-item">system_settings</a><a href="#audit" class="sidebar-item">audit_logs</a></div><div class="sidebar-section"><div class="sidebar-label">Relacionamentos</div><a href="#relacionamentos" class="sidebar-item">Mapa de vínculos</a></div></aside>
+  <main>
+    <div class="hero" id="banco"><div class="hero-tag">// DOC_2 · banco_de_dados</div><h1>Database Schema<br>Essencial</h1><p>Estrutura mínima: multi-tenant, assinaturas, faturas, notificações e integração com Mercado Pago.</p><div class="hero-chips"><div class="hero-chip">PostgreSQL</div><div class="hero-chip">10 tabelas</div><div class="hero-chip">Multi-tenant</div><div class="hero-chip">Mercado Pago</div></div></div>
+    <section id="tenants"><div class="section-header"><div class="section-num">01</div><div><div class="section-title">tenants</div><div class="section-sub">Clientes do SaaS</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">tenants</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span> DEFAULT gen_random_uuid()</td><td>ID único</td></tr>
+      <tr><td>razao_social</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Razão social</td></tr>
+      <tr><td>cnpj_cpf</td><td>VARCHAR(20)</td><td>UNIQUE NOT NULL</td><td>CNPJ/CPF</td></tr>
+      <tr><td>email</td><td>VARCHAR(255)</td><td><span class="b b-uq">UQ</span> NOT NULL</td><td>E-mail principal</td></tr>
+      <tr><td>whatsapp</td><td>VARCHAR(20)</td><td>NOT NULL</td><td>WhatsApp contato</td></tr>
+      <tr><td>subdomain</td><td>VARCHAR(100)</td><td><span class="b b-uq">UQ</span> NOT NULL</td><td>Subdomínio escolhido</td></tr>
+      <tr><td>status</td><td>ENUM</td><td>DEFAULT 'active'</td><td>active, blocked, cancelled</td></tr>
+      <tr><td>plan_id</td><td>UUID</td><td><span class="b b-fk">FK</span> → plans.id</td><td>Plano atual</td></tr>
+      <tr><td>blocked_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Data bloqueio</td></tr>
+      <tr><td>cancelled_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Cancelamento</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+      <tr><td>internal_notes</td><td>TEXT</td><td>NULL</td><td>Notas admin</td></tr>
+    </tbody></table></div></section>
+    <section id="users"><div class="section-header"><div class="section-num">02</div><div><div class="section-title">users</div><div class="section-sub">Usuários e admins</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">users</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> → tenants.id NULL</td><td>NULL = admin sistema</td></tr>
+      <tr><td>name</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Nome</td></tr>
+      <tr><td>email</td><td>VARCHAR(255)</td><td><span class="b b-uq">UQ</span> NOT NULL</td><td>Login</td></tr>
+      <tr><td>password_hash</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Hash bcrypt</td></tr>
+      <tr><td>role</td><td>ENUM</td><td>NOT NULL</td><td>super_admin, admin, tenant_owner, tenant_user</td></tr>
+      <tr><td>is_active</td><td>BOOLEAN</td><td>DEFAULT true</td><td>Conta ativa</td></tr>
+      <tr><td>last_login_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>-</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="domains"><div class="section-header"><div class="section-num">03</div><div><div class="section-title">domains</div><div class="section-sub">Domínios próprios (comprados ou apontados)</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">domains</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NOT NULL</td><td>Dono</td></tr>
+      <tr><td>domain</td><td>VARCHAR(255)</td><td><span class="b b-uq">UQ</span> NOT NULL</td><td>meusite.com.br</td></tr>
+      <tr><td>is_primary</td><td>BOOLEAN</td><td>DEFAULT true</td><td>Principal</td></tr>
+      <tr><td>dns_status</td><td>ENUM</td><td>DEFAULT 'pending'</td><td>pending, active, error</td></tr>
+      <tr><td>ssl_status</td><td>ENUM</td><td>DEFAULT 'pending'</td><td>pending, issued, error</td></tr>
+      <tr><td>ssl_expires_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>-</td></tr>
+      <tr><td>domain_expires_at</td><td>DATE</td><td>NULL</td><td>Vencimento registro</td></tr>
+      <tr><td>purchased_via_api</td><td>BOOLEAN</td><td>DEFAULT false</td><td>Comprado via API integrada</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="sites"><div class="section-header"><div class="section-num">04</div><div><div class="section-title">sites</div><div class="section-sub">Configuração do site único do tenant</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">sites</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> UNIQUE</td><td>1:1 com tenant</td></tr>
+      <tr><td>layout_type</td><td>ENUM</td><td>NOT NULL DEFAULT 'landing'</td><td>landing, institutional, showcase (vitrine)</td></tr>
+      <tr><td>title</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Título do site</td></tr>
+      <tr><td>description</td><td>TEXT</td><td>NULL</td><td>Descrição</td></tr>
+      <tr><td>logo_url</td><td>VARCHAR(500)</td><td>NULL</td><td>Logo</td></tr>
+      <tr><td>primary_color</td><td>VARCHAR(7)</td><td>DEFAULT '#1e40af'</td><td>Cor principal</td></tr>
+      <tr><td>secondary_color</td><td>VARCHAR(7)</td><td>DEFAULT '#0ea5e9'</td><td>Cor secundária</td></tr>
+      <tr><td>whatsapp_number</td><td>VARCHAR(20)</td><td>NULL</td><td>Botão WhatsApp flutuante</td></tr>
+      <tr><td>social_links</td><td>JSONB</td><td>NULL</td><td>Redes sociais</td></tr>
+      <tr><td>is_published</td><td>BOOLEAN</td><td>DEFAULT false</td><td>Publicado</td></tr>
+      <tr><td>published_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Data publicação</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+      <tr><td>updated_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="site_sections"><div class="section-header"><div class="section-num">05</div><div><div class="section-title">site_sections</div><div class="section-sub">Seções do site (drag & drop)</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">site_sections</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>site_id</td><td>UUID</td><td><span class="b b-fk">FK</span> → sites.id</td><td>Site dono</td></tr>
+      <tr><td>section_type</td><td>VARCHAR(50)</td><td>NOT NULL</td><td>hero, about, services, gallery, contact, products, etc</td></tr>
+      <tr><td>order_index</td><td>INT</td><td>DEFAULT 0</td><td>Posição</td></tr>
+      <tr><td>is_visible</td><td>BOOLEAN</td><td>DEFAULT true</td><td>Visível</td></tr>
+      <tr><td>content</td><td>JSONB</td><td>NOT NULL DEFAULT '{}'</td><td>Conteúdo da seção</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+      <tr><td>updated_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="products"><div class="section-header"><div class="section-num">06</div><div><div class="section-title">products</div><div class="section-sub">Produtos da vitrine (apenas catálogo)</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">products</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> → tenants.id</td><td>Dono</td></tr>
+      <tr><td>name</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Nome produto</td></tr>
+      <tr><td>slug</td><td>VARCHAR(220)</td><td>NOT NULL</td><td>URL amigável</td></tr>
+      <tr><td>description</td><td>TEXT</td><td>NULL</td><td>Descrição</td></tr>
+      <tr><td>images</td><td>JSONB</td><td>DEFAULT '[]'</td><td>Array de URLs</td></tr>
+      <tr><td>is_featured</td><td>BOOLEAN</td><td>DEFAULT false</td><td>Destaque</td></tr>
+      <tr><td>is_active</td><td>BOOLEAN</td><td>DEFAULT true</td><td>Ativo</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="plans"><div class="section-header"><div class="section-num">07</div><div><div class="section-title">plans</div><div class="section-sub">Planos de assinatura</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">plans</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>name</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Free, Pro, Business</td></tr>
+      <tr><td>slug</td><td>VARCHAR(50)</td><td>UNIQUE</td><td>free, pro, business</td></tr>
+      <tr><td>price</td><td>DECIMAL(10,2)</td><td>NOT NULL</td><td>Valor mensal</td></tr>
+      <tr><td>allows_custom_domain</td><td>BOOLEAN</td><td>DEFAULT false</td><td>Domínio próprio</td></tr>
+      <tr><td>max_products</td><td>INT</td><td>NULL</td><td>Limite produtos (vitrine)</td></tr>
+      <tr><td>max_sections</td><td>INT</td><td>NULL</td><td>Limite seções</td></tr>
+      <tr><td>remove_branding</td><td>BOOLEAN</td><td>DEFAULT false</td><td>Remove marca TVLoja</td></tr>
+      <tr><td>is_active</td><td>BOOLEAN</td><td>DEFAULT true</td><td>Ativo</td></tr>
+    </tbody></table></div></section>
+    <section id="subscriptions"><div class="section-header"><div class="section-num">08</div><div><div class="section-title">subscriptions</div><div class="section-sub">Assinaturas ativas e histórico</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">subscriptions</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NOT NULL</td><td>Tenant</td></tr>
+      <tr><td>plan_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NOT NULL</td><td>Plano</td></tr>
+      <tr><td>status</td><td>ENUM</td><td>DEFAULT 'active'</td><td>active, cancelled, expired, suspended</td></tr>
+      <tr><td>billing_day</td><td>INT</td><td>DEFAULT 1</td><td>Dia vencimento</td></tr>
+      <tr><td>started_at</td><td>TIMESTAMPTZ</td><td>NOT NULL</td><td>Início</td></tr>
+      <tr><td>cancelled_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Cancelamento</td></tr>
+      <tr><td>mp_subscription_id</td><td>VARCHAR(200)</td><td>NULL</td><td>ID no Mercado Pago</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="invoices"><div class="section-header"><div class="section-num">09</div><div><div class="section-title">invoices</div><div class="section-sub">Faturas geradas</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">invoices</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NOT NULL</td><td>Tenant</td></tr>
+      <tr><td>subscription_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NOT NULL</td><td>Assinatura</td></tr>
+      <tr><td>invoice_number</td><td>VARCHAR(20)</td><td>UNIQUE</td><td>Número sequencial</td></tr>
+      <tr><td>amount</td><td>DECIMAL(10,2)</td><td>NOT NULL</td><td>Valor base</td></tr>
+      <tr><td>discount</td><td>DECIMAL(10,2)</td><td>DEFAULT 0</td><td>Desconto</td></tr>
+      <tr><td>fine_amount</td><td>DECIMAL(10,2)</td><td>DEFAULT 0</td><td>Multa</td></tr>
+      <tr><td>interest_amount</td><td>DECIMAL(10,2)</td><td>DEFAULT 0</td><td>Juros</td></tr>
+      <tr><td>total_amount</td><td>DECIMAL(10,2)</td><td>NOT NULL</td><td>Total</td></tr>
+      <tr><td>status</td><td>ENUM</td><td>DEFAULT 'pending'</td><td>pending, paid, overdue, cancelled</td></tr>
+      <tr><td>due_date</td><td>DATE</td><td>NOT NULL</td><td>Vencimento</td></tr>
+      <tr><td>paid_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Pagamento</td></tr>
+      <tr><td>mp_payment_id</td><td>VARCHAR(200)</td><td>NULL</td><td>ID no Mercado Pago</td></tr>
+      <tr><td>payment_url</td><td>TEXT</td><td>NULL</td><td>Link pagamento</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="notifications"><div class="section-header"><div class="section-num">10</div><div><div class="section-title">notifications</div><div class="section-sub">Log de notificações (WhatsApp + E-mail)</div></div></div>
+    <div class="table-block"><div class="table-block-header"><div class="table-name">notifications</div></div><table class="t"><thead><tr><th>Coluna</th><th>Tipo</th><th>Modificadores</th><th>Descrição</th></tr></thead><tbody>
+      <tr><td>id</td><td>UUID</td><td><span class="b b-pk">PK</span></td><td>ID</td></tr>
+      <tr><td>tenant_id</td><td>UUID</td><td><span class="b b-fk">FK</span> NULL</td><td>NULL = comunicado geral</td></tr>
+      <tr><td>channel</td><td>ENUM</td><td>NOT NULL</td><td>whatsapp, email</td></tr>
+      <tr><td>event_type</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>invoice_generated, payment_confirmed, account_blocked</td></tr>
+      <tr><td>recipient</td><td>VARCHAR(255)</td><td>NOT NULL</td><td>E-mail ou número WhatsApp</td></tr>
+      <tr><td>subject</td><td>VARCHAR(300)</td><td>NULL</td><td>Assunto e-mail</td></tr>
+      <tr><td>body</td><td>TEXT</td><td>NOT NULL</td><td>Conteúdo</td></tr>
+      <tr><td>status</td><td>ENUM</td><td>DEFAULT 'pending'</td><td>pending, sent, failed</td></tr>
+      <tr><td>sent_at</td><td>TIMESTAMPTZ</td><td>NULL</td><td>Data envio</td></tr>
+      <tr><td>retry_count</td><td>INT</td><td>DEFAULT 0</td><td>Tentativas</td></tr>
+      <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>DEFAULT now()</td><td>-</td></tr>
+    </tbody></table></div></section>
+    <section id="relacionamentos"><div class="section-header"><div class="section-num">REL</div><div><div class="section-title">Relacionamentos Simplificados</div></div></div>
+    <div class="rel-grid">
+      <div class="rel-card"><div class="rel-title">tenants → plans</div><div class="rel-arrow">tenants.plan_id <span class="rel-type">N:1</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → users</div><div class="rel-arrow">users.tenant_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → domains</div><div class="rel-arrow">domains.tenant_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → sites</div><div class="rel-arrow">sites.tenant_id <span class="rel-type">1:1</span></div></div>
+      <div class="rel-card"><div class="rel-title">sites → site_sections</div><div class="rel-arrow">site_sections.site_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → products</div><div class="rel-arrow">products.tenant_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → subscriptions</div><div class="rel-arrow">subscriptions.tenant_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">subscriptions → invoices</div><div class="rel-arrow">invoices.subscription_id <span class="rel-type">1:N</span></div></div>
+      <div class="rel-card"><div class="rel-title">tenants → notifications</div><div class="rel-arrow">notifications.tenant_id <span class="rel-type">1:N</span></div></div>
+    </div></section>
+  </main>
+</div>
+</body>
+</html>
