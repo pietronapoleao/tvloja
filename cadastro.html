@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>TVLoja · Cadastro e Onboarding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, color 0.2s ease;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* Temas */
+    :root {
+      --bg: #f9fafb;
+      --card-bg: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --input-bg: #ffffff;
+      --input-border: #d1d5db;
+      --input-focus: #3b82f6;
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-soft: #fff7ed;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+      --input-border: #334155;
+      --input-focus: #f97316;
+      --primary: #f97316;
+      --primary-hover: #fdba74;
+      --primary-soft: #2d1a0e;
+    }
+
+    body { background-color: var(--bg); color: var(--text-primary); }
+
+    .login-container { width: 100%; max-width: 500px; margin: 0 auto; }
+
+    .login-card {
+      background: var(--card-bg);
+      border-radius: 2rem;
+      padding: 2.5rem 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(2px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Header e Logo */
+    .logo-area { text-align: center; margin-bottom: 1.5rem; }
+    .logo {
+      font-family: 'Inter', monospace; font-weight: 800; font-size: 1.8rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #facc15 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--text-primary); -webkit-background-clip: unset; }
+    
+    /* Indicador de Passos */
+    .progress-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 2rem; }
+    .step-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+    .step-dot.active { background: var(--primary); transform: scale(1.2); }
+    .step-dot.completed { background: var(--success); }
+
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary); text-align: center; }
+    .welcome-text { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; text-align: center; line-height: 1.5; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: absolute; top: 1.5rem; right: 1.5rem; background: var(--card-bg);
+      border: 1px solid var(--border); border-radius: 3rem; padding: 0.5rem 0.9rem;
+      display: flex; gap: 0.5rem; cursor: pointer; transition: all 0.2s; z-index: 10;
+    }
+    .theme-toggle i { font-size: 1rem; color: var(--text-secondary); }
+    .theme-toggle:hover { background: var(--border); }
+
+    /* Botões Sociais */
+    .social-grid { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .social-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 2rem;
+      padding: 0.65rem 0.5rem; font-weight: 500; font-size: 0.8rem; color: var(--text-primary);
+      cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .social-btn i { font-size: 1.2rem; }
+    .social-btn:hover { background: var(--bg); transform: translateY(-2px); }
+
+    .separator { display: flex; align-items: center; text-align: center; margin: 1.5rem 0; color: var(--text-muted); font-size: 0.7rem; }
+    .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
+    .separator span { margin: 0 0.7rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+
+    /* Formulários e Inputs Padrão */
+    .input-group { margin-bottom: 1.25rem; }
+    label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.5rem; }
+    
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper i { position: absolute; left: 1rem; color: var(--text-muted); font-size: 1rem; }
+    
+    input, select {
+      width: 100%; padding: 0.85rem 1rem 0.85rem 2.5rem;
+      background: var(--input-bg); border: 1px solid var(--input-border);
+      border-radius: 1.2rem; font-size: 0.9rem; color: var(--text-primary);
+      transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    select { padding-left: 1rem; appearance: none; }
+    input:focus, select:focus { outline: none; border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+
+    /* --- NOVO LAYOUT DO INPUT SUBDOMÍNIO --- */
+    .subdomain-wrapper {
+      display: flex; align-items: center; background: var(--input-bg);
+      border: 1px solid var(--input-border); border-radius: 0.8rem;
+      transition: 0.2s; overflow: hidden;
+    }
+    .subdomain-wrapper:focus-within { border-color: var(--input-focus); box-shadow: 0 0 0 3px rgba(249,115,22,0.2); }
+    
+    .subdomain-prefix {
+      background: var(--bg); color: var(--text-muted); font-weight: 600;
+      padding: 0.85rem 0.5rem 0.85rem 1rem; border-right: 1px solid var(--input-border);
+      font-size: 0.85rem; height: 100%; display: flex; align-items: center;
+    }
+    
+    .subdomain-wrapper input {
+      flex: 1; border: none; padding: 0.85rem 0.5rem; background: transparent;
+      outline: none; font-size: 0.9rem; color: var(--text-primary); min-width: 0; box-shadow: none;
+    }
+    
+    .subdomain-suffix {
+      color: var(--text-muted); font-weight: 600; padding: 0.85rem 1rem 0.85rem 0.5rem; font-size: 0.85rem; white-space: nowrap;
+    }
+
+    /* Sugestões de Subdomínio (Estilo Google) */
+    .suggestion-box { display: none; margin-top: 1rem; text-align: left; }
+    .suggestion-title { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+    .suggestion-list { display: flex; flex-direction: column; gap: 8px; }
+    .suggestion-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 15px;
+      border: 1px solid var(--border); border-radius: 0.5rem; cursor: pointer;
+      transition: 0.2s; background: var(--card-bg);
+    }
+    .suggestion-item:hover { background: var(--bg); border-color: var(--input-focus); }
+    .suggestion-item input[type="radio"] { width: auto; margin: 0; cursor: pointer; box-shadow: none; }
+    .suggestion-item span { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+
+    /* Mensagens de Feedback */
+    .feedback-msg { display: none; padding: 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; text-align: center; margin-top: 1rem; margin-bottom: 1rem;}
+    .feedback-success { background: #dcfce7; color: #166534; }
+    .feedback-error { background: #fee2e2; color: #991b1b; }
+    .dark .feedback-success { background: #064e3b; color: #4ade80; }
+    .dark .feedback-error { background: #450a0a; color: #f87171; }
+
+    /* OTP Code Inputs (6 dígitos) */
+    .otp-container { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 1.5rem; }
+    .otp-container input { width: 45px; height: 55px; padding: 0; text-align: center; font-size: 1.5rem; font-weight: 700; border-radius: 12px; }
+
+    /* Input Color para o Onboarding */
+    .color-input-wrapper { display: flex; align-items: center; gap: 15px; }
+    input[type="color"] { padding: 0; width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; overflow: hidden; }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: none; }
+
+    /* Botões */
+    .btn-primary {
+      width: 100%; background: var(--primary); border: none; padding: 0.9rem;
+      border-radius: 1.8rem; font-weight: 700; font-size: 0.95rem; color: white;
+      margin-top: 1rem; cursor: pointer; transition: 0.2s;
+    }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    .btn-link {
+      background: none; border: none; color: var(--text-muted); font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+      transition: 0.2s; text-decoration: none;
+    }
+    .btn-link:hover { color: var(--primary); }
+    .btn-back { margin-bottom: 1.5rem; }
+
+    /* Animação das telas (Steps) */
+    .step-content { display: none; animation: fadeIn 0.4s ease forwards; }
+    .step-content.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Grid para dados */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+    @media (max-width: 520px) {
+      .login-card { padding: 2rem 1.5rem; }
+      .grid-2 { grid-template-columns: 1fr; gap: 0; }
+      .otp-container input { width: 40px; height: 50px; font-size: 1.2rem; }
+      .social-btn { font-size: 0.7rem; padding: 0.5rem 0.3rem; }
+      .social-btn i { font-size: 1rem; }
+      .subdomain-prefix, .subdomain-suffix { font-size: 0.75rem; padding: 0.85rem 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-sun"></i>
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-area">
+        <div class="logo">TV<span>Loja</span></div>
+      </div>
+
+      <div class="progress-bar" id="progressBar">
+        <div class="step-dot active" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+        <div class="step-dot" id="dot-3"></div>
+        <div class="step-dot" id="dot-4"></div>
+        <div class="step-dot" id="dot-5"></div>
+      </div>
+
+      <div class="step-content active" id="step-1">
+        <h1>Crie sua Loja Virtual</h1>
+        <div class="welcome-text">Qual será o endereço de acesso do seu site?</div>
+        
+        <div class="input-group" style="margin-bottom: 0;">
+          <label>Endereço do seu site *</label>
+          <div class="subdomain-wrapper">
+            <span class="subdomain-prefix">https://</span>
+            <input type="text" id="subdomain" placeholder="ex: minha-empresa" autocomplete="off" oninput="resetSubdomainCheck()">
+            <span class="subdomain-suffix">.tvloja.com.br</span>
+          </div>
+          <p style="font-size: 0.7rem; color: var(--danger); margin-top: 5px; font-weight: 500;">Mínimo 3 caracteres</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Este será o endereço da sua loja. Ex: suaempresa.tvloja.com.br</p>
+        </div>
+
+        <div id="feedbackMsg" class="feedback-msg"></div>
+
+        <div class="suggestion-box" id="suggestionBox">
+          <p class="suggestion-title">Crie um endereço com base nas sugestões:</p>
+          <div class="suggestion-list" id="suggestionList">
+            </div>
+        </div>
+
+        <button class="btn-primary" id="btnVerify" onclick="checkSubdomain()">Verificar Disponibilidade</button>
+        
+        <button class="btn-primary" id="btnNext1" onclick="nextStep(1)" style="display: none; background-color: var(--success);">
+          Avançar <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>
+        </button>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+          Já tem uma conta? <a href="#" class="btn-link" style="font-size: 0.8rem; text-transform: none;">Fazer Login</a>
+        </div>
+      </div>
+
+      <div class="step-content" id="step-2">
+        <button class="btn-link btn-back" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Voltar</button>
+        <h1>Quase lá!</h1>
+        <div class="welcome-text">Escolha como deseja acessar seu painel.</div>
+
+        <div class="social-grid">
+          <button class="social-btn" onclick="socialSignup('Google')">
+            <i class="fab fa-google"></i> <span>Google</span>
+          </button>
+          <button class="social-btn" onclick="socialSignup('GitHub')">
+            <i class="fab fa-github"></i> <span>GitHub</span>
+          </button>
+          <button class="social-btn" onclick="socialSignup('Microsoft')">
+            <i class="fab fa-microsoft"></i> <span>Microsoft</span>
+          </button>
+        </div>
+
+        <div class="separator"><span>ou preencha seus dados</span></div>
+
+        <div class="input-group">
+          <label>Nome Completo</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" placeholder="Seu nome" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>E-mail</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="userEmail" placeholder="seu@email.com" required>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>WhatsApp</label>
+            <div class="input-wrapper">
+              <i class="fab fa-whatsapp"></i>
+              <input type="tel" placeholder="(11) 99999-9999" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Senha de Acesso</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" placeholder="Crie uma senha forte" required>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="nextStep(2)">Criar Conta e Continuar</button>
+      </div>
+
+      <div class="step-content" id="step-3">
+        <button class="btn-link btn-back" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Corrigir e-mail</button>
+        <h1>Verifique seu E-mail</h1>
+        <div class="welcome-text">
+          Enviamos um código de 6 dígitos para <br>
+          <strong id="displayEmail" style="color: var(--text-primary);">seu@email.com</strong>
+        </div>
+
+        <div class="otp-container" id="otpContainer">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+          <input type="text" maxlength="1" oninput="moveToNext(this, event)">
+        </div>
+
+        <button class="btn-primary" onclick="nextStep(3)">Confirmar Código</button>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button class="btn-link" onclick="alert('Código reenviado!')"><i class="fas fa-redo-alt"></i> Reenviar código</button>
+        </div>
+      </div>
+
+      <div class="step-content" id="step-4">
+        <h1>Personalize seu Site</h1>
+        <div class="welcome-text">Defina a cara do seu negócio na internet.</div>
+
+        <div class="input-group">
+          <label>Nome do Site / Marca</label>
+          <div class="input-wrapper">
+            <i class="fas fa-store"></i>
+            <input type="text" id="siteName" placeholder="Ex: TVLoja Eletrônicos" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Tipo de Layout</label>
+          <select id="layoutType">
+            <option value="vitrine">Vitrine de Produtos (Catálogo)</option>
+            <option value="landing">Landing Page (Venda Única)</option>
+            <option value="institucional">Site Institucional</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Cor Principal da Marca</label>
+          <div class="color-input-wrapper">
+            <input type="color" id="primaryColor" value="#f97316">
+            <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Selecione a cor que representa sua marca.</span>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="nextStep(4)"><i class="fas fa-magic"></i> Gerar Meu Site</button>
+      </div>
+
+      <div class="step-content" id="step-5" style="text-align: center; padding: 1rem 0;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #dcfce7; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">
+          <i class="fas fa-check"></i>
+        </div>
+        <h1 style="font-size: 1.8rem;">Site Publicado!</h1>
+        <div class="welcome-text" style="margin-bottom: 1rem;">Sua conta foi vinculada e seu site já está no ar.</div>
+        
+        <div style="background: var(--bg); border: 1px solid var(--border); padding: 1rem; border-radius: 1rem; margin-bottom: 2rem;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 5px;">Seu Link de Acesso</span>
+          <a href="#" id="finalLink" style="color: var(--primary); font-weight: 700; font-size: 1.1rem; text-decoration: none;">minhamarca.tvloja.com.br</a>
+        </div>
+
+        <button class="btn-primary" onclick="alert('Redirecionando para o Dashboard Administrativo...')">Acessar Meu Painel <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Gerenciamento de Tema Escuro/Claro
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    if (localStorage.getItem('tvloja-theme') === 'dark') {
+      body.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('tvloja-theme', body.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Resetar UI quando o usuário digita no input do subdomínio
+    function resetSubdomainCheck() {
+      document.getElementById('feedbackMsg').style.display = 'none';
+      document.getElementById('suggestionBox').style.display = 'none';
+      document.getElementById('btnVerify').style.display = 'block';
+      document.getElementById('btnNext1').style.display = 'none';
+    }
+
+    // Função Simulada da API para checar o subdomínio
+    function checkSubdomain() {
+      const input = document.getElementById('subdomain');
+      const sub = input.value.toLowerCase().trim();
+      
+      if(!sub || sub.length < 3) return alert('Por favor, digite pelo menos 3 caracteres.');
+
+      const btnVerify = document.getElementById('btnVerify');
+      btnVerify.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verificando...';
+      btnVerify.disabled = true;
+
+      // Simulando delay da API
+      setTimeout(() => {
+        btnVerify.innerHTML = 'Verificar Disponibilidade';
+        btnVerify.disabled = false;
+
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        const suggestionBox = document.getElementById('suggestionBox');
+        const suggestionList = document.getElementById('suggestionList');
+        const btnNext = document.getElementById('btnNext1');
+
+        // Simulação de banco de dados (nomes indisponíveis)
+        const inUse = ['loja', 'admin', 'teste', 'suporte', 'oficial'];
+
+        if (inUse.includes(sub)) {
+          // INDISPONÍVEL
+          feedbackMsg.innerHTML = `<i class="fas fa-times-circle"></i> O subdomínio "${sub}" já está em uso.`;
+          feedbackMsg.className = 'feedback-msg feedback-error';
+          feedbackMsg.style.display = 'block';
+          
+          btnVerify.style.display = 'none';
+
+          // Popula lista de sugestões estilo Google
+          suggestionList.innerHTML = '';
+          const sugestoes = [`${sub}oficial`, `${sub}br`, `minha${sub}`];
+          
+          sugestoes.forEach((sugestao, index) => {
+            suggestionList.innerHTML += `
+              <label class="suggestion-item" onclick="selectSuggestion('${sugestao}')">
+                <input type="radio" name="domain_suggestion" value="${sugestao}">
+                <span>${sugestao}</span>
+              </label>
+            `;
+          });
+          
+          suggestionBox.style.display = 'block';
+          
+        } else {
+          // DISPONÍVEL
+          feedbackMsg.innerHTML = `<i class="fas fa-check-circle"></i> O subdomínio "${sub}" está disponível!`;
+          feedbackMsg.className = 'feedback-msg feedback-success';
+          feedbackMsg.style.display = 'block';
+          
+          suggestionBox.style.display = 'none';
+          btnVerify.style.display = 'none';
+          btnNext.style.display = 'block';
+        }
+      }, 800);
+    }
+
+    // Ação ao selecionar uma sugestão da lista
+    function selectSuggestion(selectedSubdomain) {
+      // 1. Substitui o valor no input
+      document.getElementById('subdomain').value = selectedSubdomain;
+      
+      // 2. Atualiza a mensagem para sucesso
+      const feedbackMsg = document.getElementById('feedbackMsg');
+      feedbackMsg.innerHTML = `<i class="fas fa-check-circle"></i> O subdomínio "${selectedSubdomain}" está disponível!`;
+      feedbackMsg.className = 'feedback-msg feedback-success';
+      
+      // 3. Exibe o botão de Avançar
+      document.getElementById('btnNext1').style.display = 'block';
+    }
+
+
+    // Lógica dos inputs do código OTP (6 dígitos)
+    function moveToNext(current, event) {
+      if (current.value.length >= 1) {
+        let next = current.nextElementSibling;
+        if (next) next.focus();
+      }
+    }
+
+    // Permite voltar com backspace no OTP
+    document.getElementById('otpContainer').addEventListener('keydown', function(e) {
+      if (e.key === "Backspace" && e.target.value === "") {
+        let prev = e.target.previousElementSibling;
+        if (prev) {
+          prev.focus();
+          prev.value = "";
+        }
+      }
+    });
+
+    // Lógica de Steps (Navegação SPA)
+    function showStep(stepNumber) {
+      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.step-dot').forEach((dot, index) => {
+        dot.classList.remove('active', 'completed');
+        if (index + 1 < stepNumber) dot.classList.add('completed');
+        if (index + 1 === stepNumber) dot.classList.add('active');
+      });
+      document.getElementById(`step-${stepNumber}`).classList.add('active');
+    }
+
+    // Função de Cadastro Social (Pula a etapa 3)
+    function socialSignup(provider) {
+      alert(`🔑 Autenticando com ${provider}... (Simulação)`);
+      // Pula direto para a etapa 4 (Onboarding), ignorando o PIN
+      showStep(4);
+    }
+
+    function nextStep(currentStep) {
+      const btn = event.currentTarget;
+      
+      // Step 1 -> Step 2
+      if(currentStep === 1) {
+        const sub = document.getElementById('subdomain').value;
+        document.getElementById('finalLink').innerText = `${sub.toLowerCase()}.tvloja.com.br`;
+        showStep(2);
+        return;
+      }
+
+      // Step 2: Dados Manuais (Cria conta e envia e-mail com PIN)
+      if(currentStep === 2) {
+        const email = document.getElementById('userEmail').value;
+        if(!email) return alert('Por favor, informe seu e-mail.');
+        
+        document.getElementById('displayEmail').innerText = email; 
+
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Criando conta...';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.innerHTML = 'Criar Conta e Continuar';
+          btn.disabled = false;
+          showStep(3); // Vai para OTP
+        }, 1000);
+        return;
+      }
+
+      // Step 3: Validação do Código OTP (Somente Manual)
+      if(currentStep === 3) {
+        const otpInputs = document.querySelectorAll('#otpContainer input');
+        let code = '';
+        otpInputs.forEach(input => code += input.value);
+        if(code.length < 6) return alert('Por favor, preencha o código de 6 dígitos.');
+
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verificando...';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.innerHTML = 'Confirmar Código';
+          btn.disabled = false;
+          showStep(4);
+        }, 800);
+        return;
+      }
+
+      // Step 4: Onboarding (Gerando Site)
+      if(currentStep === 4) {
+        const siteName = document.getElementById('siteName').value;
+        if(!siteName) return alert('Informe o nome da sua marca.');
+
+        btn.innerHTML = '<i class="fas fa-magic fa-spin"></i> Gerando layout...';
+        btn.disabled = true;
+        setTimeout(() => {
+          showStep(5);
+        }, 1500);
+        return;
+      }
+    }
+
+    function prevStep(currentStep) {
+      showStep(currentStep - 1);
+    }
+  </script>
+</body>
+</html>

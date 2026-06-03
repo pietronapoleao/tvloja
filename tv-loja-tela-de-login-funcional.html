@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>TVLoja · Login</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, color 0.2s ease;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* Light theme (default) */
+    :root {
+      --bg: #f9fafb;
+      --card-bg: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #4b5563;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --input-bg: #ffffff;
+      --input-border: #d1d5db;
+      --input-focus: #3b82f6;
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-soft: #fff7ed;
+      --social-border: #e2e8f0;
+      --social-hover-bg: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+      --input-border: #334155;
+      --input-focus: #f97316;
+      --primary: #f97316;
+      --primary-hover: #fdba74;
+      --primary-soft: #2d1a0e;
+      --social-border: #334155;
+      --social-hover-bg: #334155;
+      --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      border-radius: 2rem;
+      padding: 2rem 1.75rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(2px);
+      transition: all 0.2s ease;
+    }
+
+    /* Header */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .logo {
+      font-family: 'Inter', monospace;
+      font-weight: 800;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #facc15 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .logo span {
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      color: var(--text-primary);
+    }
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--text-primary);
+    }
+    .welcome-text {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 3rem;
+      padding: 0.5rem 0.9rem;
+      display: flex;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+    .theme-toggle i {
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+    .theme-toggle:hover {
+      background: var(--social-hover-bg);
+    }
+
+    /* Form */
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrapper i {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.5rem;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 1.2rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 1rem;
+      left: auto;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .forgot-link {
+      text-align: right;
+      margin-top: 0.3rem;
+    }
+    .forgot-link a {
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Submit button */
+    .btn-login {
+      width: 100%;
+      background: var(--primary);
+      border: none;
+      padding: 0.85rem;
+      border-radius: 1.8rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: white;
+      margin-top: 0.5rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-login:hover {
+      background: var(--primary-hover);
+    }
+    .btn-login:active {
+      transform: scale(0.98);
+    }
+
+    /* Separator */
+    .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1.5rem 0 1.2rem;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+    .separator::before, .separator::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+    .separator span {
+      margin: 0 0.7rem;
+    }
+
+    /* Social buttons */
+    .social-grid {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .social-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: var(--card-bg);
+      border: 1px solid var(--social-border);
+      border-radius: 2rem;
+      padding: 0.65rem 0.5rem;
+      font-weight: 500;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .social-btn i {
+      font-size: 1.2rem;
+    }
+    .social-btn:hover {
+      background: var(--social-hover-bg);
+      transform: translateY(-2px);
+    }
+
+    /* Signup link */
+    .signup-text {
+      text-align: center;
+      margin-top: 1.8rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .signup-text a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* error / success simulation */
+    .error-message {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-size: 0.7rem;
+      padding: 0.5rem;
+      border-radius: 1rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    body.dark .error-message {
+      background: #3b0e0e;
+      color: #fca5a5;
+    }
+    .success-mock {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .login-card {
+        padding: 1.5rem;
+      }
+      .theme-toggle {
+        top: 0.8rem;
+        right: 0.8rem;
+        padding: 0.3rem 0.7rem;
+      }
+      .social-btn {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.3rem;
+      }
+      .social-btn i {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-sun"></i>
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-area">
+        <div class="logo">TV<span>Loja</span></div>
+        <div class="tagline">SaaS · sites profissionais</div>
+      </div>
+
+      <h1>Bem-vindo de volta</h1>
+      <div class="welcome-text">Acesse sua conta para gerenciar seu site e assinatura</div>
+
+      <!-- Email/Password form -->
+      <form id="loginForm" action="javascript:void(0);">
+        <div class="input-group">
+          <label>E-mail</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="seu@email.com" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Senha</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+            <i class="fas fa-eye-slash toggle-password" id="togglePassword" style="cursor: pointer; right: 1rem; left: auto;"></i>
+          </div>
+          <div class="forgot-link">
+            <a href="#" id="forgotPasswordLink">Esqueceu a senha?</a>
+          </div>
+        </div>
+        <div id="formError" class="error-message"></div>
+        <button type="submit" class="btn-login">Entrar</button>
+      </form>
+
+      <div class="separator">
+        <span>ou continue com</span>
+      </div>
+
+      <div class="social-grid">
+        <button class="social-btn" id="googleLogin">
+          <i class="fab fa-google"></i> <span>Google</span>
+        </button>
+        <button class="social-btn" id="githubLogin">
+          <i class="fab fa-github"></i> <span>GitHub</span>
+        </button>
+        <button class="social-btn" id="microsoftLogin">
+          <i class="fab fa-microsoft"></i> <span>Microsoft</span>
+        </button>
+      </div>
+
+      <div class="signup-text">
+        Ainda não tem conta? <a href="#" id="signupLink">Criar conta grátis</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -----------------------------
+    // DARK / LIGHT MODE
+    // -----------------------------
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    // Check saved preference or system
+    const savedTheme = localStorage.getItem('tvloja-theme');
+    if (savedTheme === 'dark') {
+      body.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      body.classList.remove('dark');
+    } else {
+      // system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) body.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      const isDark = body.classList.contains('dark');
+      localStorage.setItem('tvloja-theme', isDark ? 'dark' : 'light');
+    });
+
+    // -----------------------------
+    // TOGGLE PASSWORD VISIBILITY
+    // -----------------------------
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    togglePasswordBtn.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePasswordBtn.classList.toggle('fa-eye');
+      togglePasswordBtn.classList.toggle('fa-eye-slash');
+    });
+
+    // -----------------------------
+    // SIMULATED LOGIN (Email/Password)
+    // -----------------------------
+    const loginForm = document.getElementById('loginForm');
+    const formError = document.getElementById('formError');
+    
+    // Dummy credentials for simulation (any email + password length >= 3)
+    function validateLogin(email, password) {
+      if (!email || !password) return 'Preencha e-mail e senha.';
+      if (!email.includes('@') || !email.includes('.')) return 'E-mail inválido.';
+      if (password.length < 3) return 'A senha deve ter pelo menos 3 caracteres.';
+      return null;
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorMsg = validateLogin(email, password);
+      if (errorMsg) {
+        formError.textContent = errorMsg;
+        formError.style.display = 'block';
+        setTimeout(() => {
+          formError.style.display = 'none';
+        }, 3000);
+        return;
+      }
+      // Simulate success
+      formError.style.display = 'none';
+      // Show temporary success and redirect simulation (to dashboard)
+      const originalBtn = document.querySelector('.btn-login');
+      const originalText = originalBtn.innerText;
+      originalBtn.innerText = 'Entrando...';
+      originalBtn.disabled = true;
+      setTimeout(() => {
+        alert(`✅ Login simulado com sucesso!\nBem-vindo(a), ${email}\n(Redirecionaria para o dashboard)`);
+        originalBtn.innerText = originalText;
+        originalBtn.disabled = false;
+        // In real app, redirect: window.location.href = '/dashboard';
+      }, 800);
+    });
+
+    // Forgot password simulation
+    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('🔐 Simulação: enviamos um link de recuperação para seu e-mail cadastrado.');
+    });
+
+    // Signup link simulation
+    document.getElementById('signupLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('📝 Fluxo de cadastro (simulação): redirecionar para página de registro.');
+    });
+
+    // -----------------------------
+    // SOCIAL LOGIN SIMULATIONS
+    // -----------------------------
+    function socialLogin(provider) {
+      // Simulate loading / auth popup
+      alert(`🔑 Login com ${provider} (simulação)\nEm produção, integração OAuth seria realizada.`);
+      // In real scenario: window.location.href = `/auth/${provider.toLowerCase()}`;
+    }
+
+    document.getElementById('googleLogin').addEventListener('click', () => socialLogin('Google'));
+    document.getElementById('githubLogin').addEventListener('click', () => socialLogin('GitHub'));
+    document.getElementById('microsoftLogin').addEventListener('click', () => socialLogin('Microsoft'));
+
+    // Additional micro-interaction: remove error on typing
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    function clearError() {
+      formError.style.display = 'none';
+    }
+    emailInput.addEventListener('input', clearError);
+    passInput.addEventListener('input', clearError);
+  </script>
+</body>
+</html>

@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>TVLoja · Admin SaaS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome com Bypass de CORS/CORB -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ----------------------------------
+       VARIÁVEIS DE TEMA
+       ---------------------------------- */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+      --sidebar-bg: rgba(255,255,255,0.95);
+      --card-bg: rgba(255,255,255,0.98);
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --border: rgba(0,0,0,0.08);
+      
+      /* Cores SaaS Admin */
+      --primary: #2563eb; /* Azul para diferenciar do painel do cliente */
+      --primary-hover: #1d4ed8;
+      --primary-light: rgba(37,99,235,0.12);
+      
+      --brand-orange: #f97316; /* Cor da marca TVLoja */
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      
+      --shadow-sm: 0 4px 15px rgba(0,0,0,0.03);
+      --shadow-md: 0 10px 25px rgba(0,0,0,0.08);
+      --glass-border: 1px solid rgba(255,255,255,0.8);
+      --radius: 1.2rem;
+      --sidebar-width: 280px;
+    }
+
+    body.dark {
+      --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+      --sidebar-bg: rgba(15,23,42,0.95);
+      --card-bg: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: rgba(255,255,255,0.08);
+      --shadow-sm: 0 4px 15px rgba(0,0,0,0.2);
+      --shadow-md: 0 10px 25px rgba(0,0,0,0.3);
+      --glass-border: 1px solid rgba(255,255,255,0.05);
+      --primary-light: rgba(37,99,235,0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      transition: background 0.3s ease, color 0.3s ease;
+      overflow: hidden; 
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ----------------------------------
+       LAYOUT E SIDEBAR
+       ---------------------------------- */
+    .app { display: flex; height: 100vh; width: 100%; }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(12px);
+      border-right: var(--glass-border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      z-index: 1000; box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-header { padding: 2rem 1.5rem 1.5rem; border-bottom: 1px solid var(--border); }
+
+    .logo {
+      font-weight: 800; font-size: 1.6rem;
+      color: var(--brand-orange);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo span { color: var(--text-primary); }
+    .admin-badge {
+      background: var(--primary-light); color: var(--primary);
+      font-size: 0.65rem; font-weight: 800; padding: 2px 8px;
+      border-radius: 10px; margin-left: auto; text-transform: uppercase;
+    }
+    
+    .user-info { margin-top: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
+    .avatar-lg {
+      width: 48px; height: 48px; background: var(--text-primary);
+      border-radius: 1.2rem; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.2rem; color: var(--card-bg); flex-shrink: 0;
+    }
+    .user-text .name { font-weight: 700; font-size: 0.9rem; }
+    .user-text .email { font-size: 0.75rem; color: var(--text-muted); word-break: break-all; }
+
+    .sidebar-nav {
+      flex: 1; padding: 1.8rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 10px 0 5px 15px; font-weight: 700; }
+    .nav-item {
+      display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem;
+      border-radius: 1rem; color: var(--text-secondary); transition: all 0.2s;
+      cursor: pointer; font-weight: 600; font-size: 0.85rem;
+    }
+    .nav-item i { width: 1.6rem; font-size: 1.1rem; text-align: center; }
+    .nav-item:hover { background: var(--primary-light); color: var(--primary); transform: translateX(5px); }
+    .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+    .nav-item.active i { color: #fff; }
+
+    .sidebar-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 998; backdrop-filter: blur(3px);
+    }
+    .sidebar-overlay.show { display: block; }
+
+    /* ----------------------------------
+       MAIN CONTENT E TOPBAR
+       ---------------------------------- */
+    .main-content {
+      margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width));
+      height: 100vh; overflow-y: auto; overflow-x: hidden;
+      padding: 2rem 2.5rem 3rem; transition: all 0.3s ease;
+    }
+    .content-wrapper { max-width: 1400px; margin: 0 auto; }
+
+    .top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .page-title { display: flex; align-items: center; gap: 15px; }
+    .page-title h1 { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem; }
+    .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+    .menu-mobile { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; }
+
+    .theme-toggle {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 2.5rem;
+      padding: 0.5rem 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; color: var(--text-primary); font-weight: 600; transition: all 0.2s;
+    }
+    .theme-toggle:hover { box-shadow: var(--shadow-sm); }
+
+    /* ----------------------------------
+       CARDS E GRIDS
+       ---------------------------------- */
+    .card-modern {
+      background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem;
+      border: var(--glass-border); box-shadow: var(--shadow-sm); transition: all 0.25s;
+    }
+    
+    .card-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .stat-icon { width: 48px; height: 48px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
+    .stat-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;}
+    .stat-value { font-size: 1.8rem; font-weight: 800; display: block; margin-bottom: 0.5rem;}
+    .stat-trend { font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    
+    .status-pill { padding: 0.3rem 0.8rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-warning { background: #fef9c3; color: #854d0e; }
+    .status-danger { background: #fee2e2; color: #991b1b; }
+    .status-blue { background: #dbeafe; color: #1e40af; }
+
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+    /* ----------------------------------
+       TABELAS E LISTAS
+       ---------------------------------- */
+    .table-container { overflow-x: auto; width: 100%; border-radius: 1rem; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { text-align: left; padding: 1rem; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.02); }
+    td { padding: 1.2rem 1rem; font-size: 0.85rem; border-bottom: 1px solid var(--border); font-weight: 500; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(0,0,0,0.01); }
+
+    .user-td { display: flex; align-items: center; gap: 10px; }
+    .user-td-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;}
+
+    .btn {
+      padding: 0.6rem 1rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
+    .btn-outline:hover { background: var(--border); }
+    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+    .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: 8px; }
+
+    /* Filtros */
+    .filters-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .form-control {
+      padding: 0.7rem 1rem; border-radius: 1rem; border: 1px solid var(--border);
+      background: var(--bg-gradient); color: var(--text-primary); font-family: 'Inter', sans-serif; transition: all 0.2s; font-size: 0.85rem;
+    }
+    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+    /* Grid de Configurações */
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .config-card { border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+    .config-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+
+    /* ----------------------------------
+       RESPONSIVIDADE
+       ---------------------------------- */
+    @media (max-width: 1024px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; width: 100vw; padding: 1.5rem; }
+      .menu-mobile { display: block; }
+      .top-bar { flex-direction: row; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay"></div>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><i class="fas fa-bolt"></i> TV<span>Loja</span> <span class="admin-badge">Admin</span></div>
+      <div class="user-info">
+        <div class="avatar-lg"><i class="fas fa-user-shield"></i></div>
+        <div class="user-text">
+          <div class="name">Super Admin</div>
+          <div class="email">admin@tvloja.com.br</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-label">Gestão SaaS</div>
+      <div class="nav-item active" data-view="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+      <div class="nav-item" data-view="clientes"><i class="fas fa-users"></i> Clientes (Tenants)</div>
+      <div class="nav-item" data-view="financeiro"><i class="fas fa-file-invoice-dollar"></i> Faturas & Receita</div>
+      <div class="nav-item" data-view="dominios"><i class="fas fa-globe"></i> Domínios & SSL</div>
+      
+      <div class="nav-label">Sistema</div>
+      <div class="nav-item" data-view="config"><i class="fas fa-cogs"></i> Configurações / APIs</div>
+      <div class="nav-item" onclick="alert('Saindo do painel admin...')"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-wrapper">
+      <header class="top-bar">
+        <div class="page-title">
+          <button class="menu-mobile" id="menuToggle"><i class="fas fa-bars"></i></button>
+          <div>
+            <h1 id="pageTitle">Dashboard Geral</h1>
+            <p id="pageSubtitle">Visão geral do desempenho e saúde do SaaS.</p>
+          </div>
+        </div>
+        
+        <div class="theme-toggle" id="themeToggle">
+          <i class="fas fa-sun" id="iconSun"></i> / <i class="fas fa-moon" id="iconMoon"></i> 
+        </div>
+      </header>
+
+      <div id="dynamicContent">
+        <!-- O conteúdo será injetado pelo JavaScript aqui -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ----------------------------------
+  // GESTÃO DE TEMA E MENU MOBILE
+  // ----------------------------------
+  const body = document.body;
+  const themeToggle = document.getElementById('themeToggle');
+  
+  if (localStorage.getItem('theme-admin') === 'dark') {
+    body.classList.add('dark');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark');
+    const isDark = body.classList.contains('dark');
+    localStorage.setItem('theme-admin', isDark ? 'dark' : 'light');
+    if (document.getElementById('mrrChart')) initChart();
+  });
+
+  const menuToggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+
+  function toggleMobileMenu() {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  }
+  menuToggle.addEventListener('click', toggleMobileMenu);
+  overlay.addEventListener('click', toggleMobileMenu);
+
+  // ----------------------------------
+  // RENDERIZAÇÃO DE VIEWS (SPA SIMULADA)
+  // ----------------------------------
+  const container = document.getElementById('dynamicContent');
+  const pageTitle = document.getElementById('pageTitle');
+  const pageSubtitle = document.getElementById('pageSubtitle');
+  let myChart = null;
+
+  function renderView(viewId) {
+    if (viewId === 'dashboard') {
+      pageTitle.innerText = 'Dashboard Geral';
+      pageSubtitle.innerText = 'Métricas e saúde financeira do sistema SaaS.';
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="card-modern stat-card">
+            <div class="stat-header">
+              <div class="stat-icon" style="background: var(--success);"><i class="fas fa-dollar-sign"></i></div>
+            </div>
+            <span class="stat-label">MRR (Receita Recorrente)</span>
+            <span class="stat-value">R$ 14.520,00</span>
+            <span class="stat-trend" style="color: var(--success);"><i class="fas fa-arrow-up"></i> +8.5% este mês</span>
+          </div>
+
+          <div class="card-modern stat-card">
+            <div class="stat-header">
+              <div class="stat-icon" style="background: var(--primary);"><i class="fas fa-users"></i></div>
+            </div>
+            <span class="stat-label">Clientes Ativos</span>
+            <span class="stat-value">312</span>
+            <span class="stat-trend" style="color: var(--success);"><i class="fas fa-arrow-up"></i> +15 novos</span>
+          </div>
+
+          <div class="card-modern stat-card">
+            <div class="stat-header">
+              <div class="stat-icon" style="background: var(--danger);"><i class="fas fa-chart-line"></i></div>
+            </div>
+            <span class="stat-label">Churn Rate (Cancelamentos)</span>
+            <span class="stat-value">2.4%</span>
+            <span class="stat-trend" style="color: var(--danger);"><i class="fas fa-arrow-down"></i> -0.5% vs último mês</span>
+          </div>
+
+          <div class="card-modern stat-card">
+            <div class="stat-header">
+              <div class="stat-icon" style="background: var(--warning);"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <span class="stat-label">Inadimplência</span>
+            <span class="stat-value">R$ 1.840,00</span>
+            <span class="stat-trend" style="color: var(--warning);"><i class="fas fa-minus"></i> 34 faturas atrasadas</span>
+          </div>
+        </div>
+
+        <div class="main-grid">
+          <div class="card-modern" style="min-width: 0;">
+            <div class="card-title">
+              <span>📈 Crescimento de Receita (6 Meses)</span>
+            </div>
+            <div style="height: 300px; position: relative; width: 100%;">
+              <canvas id="mrrChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card-modern">
+            <div class="card-title">🚨 Alertas do Sistema</div>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+              <div style="display: flex; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+                <div style="color: var(--danger); font-size: 1.2rem;"><i class="fas fa-server"></i></div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 600;">Falha de SSL detectada</p>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">Domínio "lojateste.com.br" não conseguiu emitir certificado.</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+                <div style="color: var(--warning); font-size: 1.2rem;"><i class="fab fa-whatsapp"></i></div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 600;">Fila do WhatsApp cheia</p>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">45 mensagens aguardando disparo na API Evolution.</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div style="color: var(--success); font-size: 1.2rem;"><i class="fas fa-money-check-alt"></i></div>
+                <div>
+                  <p style="font-size: 0.85rem; font-weight: 600;">Payout Mercado Pago</p>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">Transferência automática de R$ 4.500,00 concluída.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      setTimeout(initChart, 50);
+    } 
+    
+    else if (viewId === 'clientes') {
+      pageTitle.innerText = 'Gestão de Clientes (Tenants)';
+      pageSubtitle.innerText = 'Administre as lojas virtuais criadas na plataforma.';
+      container.innerHTML = `
+        <div class="card-modern">
+          <div class="filters-bar">
+            <input type="text" class="form-control" style="max-width: 300px;" placeholder="🔍 Buscar por nome, email ou domínio...">
+            <select class="form-control" style="max-width: 150px;">
+              <option>Todos os Planos</option>
+              <option>Free</option>
+              <option>Pro</option>
+              <option>Business</option>
+            </select>
+            <select class="form-control" style="max-width: 150px;">
+              <option>Status: Todos</option>
+              <option>Ativos</option>
+              <option>Inadimplentes</option>
+              <option>Bloqueados</option>
+            </select>
+            <button class="btn btn-primary" style="margin-left: auto;"><i class="fas fa-plus"></i> Novo Cliente</button>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Plano</th>
+                  <th>Site / Domínio</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="user-td">
+                      <div class="user-td-icon">MM</div>
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-primary);">Maria Moda Ltda</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">maria@email.com • (11) 9999-9999</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill status-blue">Pro</span></td>
+                  <td>mariamoda.com.br</td>
+                  <td><span class="status-pill status-active">Ativo</span></td>
+                  <td>
+                    <button class="btn btn-outline btn-sm btn-icon" title="Editar / Ver Perfil"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline btn-sm btn-icon" title="Acessar como cliente"><i class="fas fa-sign-in-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="user-td">
+                      <div class="user-td-icon" style="background:#fef3c7; color:#f59e0b">TC</div>
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-primary);">Tech Cell Center</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">contato@techcell.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill status-warning">Free</span></td>
+                  <td>techcell.tvloja.com.br</td>
+                  <td><span class="status-pill status-active">Ativo</span></td>
+                  <td>
+                    <button class="btn btn-outline btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline btn-sm btn-icon"><i class="fas fa-sign-in-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="user-td">
+                      <div class="user-td-icon" style="background:#fee2e2; color:#ef4444">JS</div>
+                      <div>
+                        <div style="font-weight: 700; color: var(--text-primary);">João Shoes</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">joao@shoes.com.br</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill status-blue">Pro</span></td>
+                  <td>joaoshoes.com.br</td>
+                  <td><span class="status-pill status-danger">Bloqueado (Pagto)</span></td>
+                  <td>
+                    <button class="btn btn-outline btn-sm btn-icon"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline btn-sm btn-icon" style="color: var(--success);" title="Desbloquear"><i class="fas fa-unlock"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    else if (viewId === 'financeiro') {
+      pageTitle.innerText = 'Gestão Financeira';
+      pageSubtitle.innerText = 'Controle de assinaturas, faturas emitidas e integração Mercado Pago.';
+      container.innerHTML = `
+        <div class="stats-grid" style="margin-bottom: 1.5rem;">
+          <div class="card-modern stat-card" style="padding: 1rem;">
+            <span class="stat-label">Recebido (Mês)</span>
+            <span class="stat-value" style="font-size: 1.4rem;">R$ 12.800</span>
+          </div>
+          <div class="card-modern stat-card" style="padding: 1rem;">
+            <span class="stat-label">A Receber</span>
+            <span class="stat-value" style="font-size: 1.4rem;">R$ 3.250</span>
+          </div>
+          <div class="card-modern stat-card" style="padding: 1rem;">
+            <span class="stat-label">Inadimplência</span>
+            <span class="stat-value" style="font-size: 1.4rem; color: var(--danger);">12%</span>
+          </div>
+        </div>
+
+        <div class="card-modern">
+          <div class="filters-bar">
+            <input type="text" class="form-control" style="max-width: 250px;" placeholder="Buscar Fatura (#ID ou Cliente)">
+            <select class="form-control" style="max-width: 150px;">
+              <option>Status: Pendente</option>
+              <option>Status: Pago</option>
+              <option>Status: Atrasado</option>
+            </select>
+            <button class="btn btn-outline" style="margin-left: auto;"><i class="fas fa-file-export"></i> Exportar CSV</button>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fatura</th>
+                  <th>Cliente</th>
+                  <th>Vencimento</th>
+                  <th>Valor Base</th>
+                  <th>Multa/Juros</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>#INV-2094</strong></td>
+                  <td>João Shoes</td>
+                  <td>05/05/2026</td>
+                  <td>R$ 49,90</td>
+                  <td style="color: var(--danger);">+ R$ 2,50</td>
+                  <td><strong>R$ 52,40</strong></td>
+                  <td><span class="status-pill status-danger">Atrasado</span></td>
+                  <td><button class="btn btn-outline btn-sm">Dar Baixa Manual</button></td>
+                </tr>
+                <tr>
+                  <td><strong>#INV-2095</strong></td>
+                  <td>Maria Moda Ltda</td>
+                  <td>15/05/2026</td>
+                  <td>R$ 49,90</td>
+                  <td>-</td>
+                  <td><strong>R$ 49,90</strong></td>
+                  <td><span class="status-pill status-warning">Pendente</span></td>
+                  <td><button class="btn btn-outline btn-sm">Enviar Link MP</button></td>
+                </tr>
+                <tr>
+                  <td><strong>#INV-2090</strong></td>
+                  <td>Tech Cell Center</td>
+                  <td>10/05/2026</td>
+                  <td>R$ 99,90</td>
+                  <td>-</td>
+                  <td><strong>R$ 99,90</strong></td>
+                  <td><span class="status-pill status-active">Pago (PIX)</span></td>
+                  <td><button class="btn btn-outline btn-sm" disabled>Baixado</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    else if (viewId === 'dominios') {
+      pageTitle.innerText = 'Monitoramento de Domínios';
+      pageSubtitle.innerText = 'Controle os apontamentos DNS e emissão de SSL dos clientes.';
+      container.innerHTML = `
+        <div class="card-modern">
+          <div class="filters-bar">
+            <input type="text" class="form-control" style="max-width: 300px;" placeholder="Buscar domínio...">
+            <button class="btn btn-primary" style="margin-left: auto;"><i class="fas fa-sync-alt"></i> Forçar Verificação Global SSL</button>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Domínio</th>
+                  <th>Cliente</th>
+                  <th>Tipo</th>
+                  <th>Status DNS</th>
+                  <th>Status SSL</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>mariamoda.com.br</strong></td>
+                  <td>Maria Moda Ltda</td>
+                  <td><span class="status-pill status-blue">Domínio Próprio</span></td>
+                  <td><span style="color: var(--success); font-weight:600;"><i class="fas fa-check"></i> Apontado</span></td>
+                  <td><span style="color: var(--success); font-weight:600;"><i class="fas fa-lock"></i> Emitido</span></td>
+                  <td><button class="btn btn-outline btn-sm">Detalhes</button></td>
+                </tr>
+                <tr>
+                  <td><strong>techcell.tvloja.com.br</strong></td>
+                  <td>Tech Cell Center</td>
+                  <td><span class="status-pill" style="background:#f1f5f9; color:#475569">Subdomínio TVLoja</span></td>
+                  <td><span style="color: var(--success); font-weight:600;"><i class="fas fa-check"></i> Interno</span></td>
+                  <td><span style="color: var(--success); font-weight:600;"><i class="fas fa-lock"></i> Emitido</span></td>
+                  <td><button class="btn btn-outline btn-sm">Detalhes</button></td>
+                </tr>
+                <tr>
+                  <td><strong>lojaexemplo.com.br</strong></td>
+                  <td>Exemplo Store</td>
+                  <td><span class="status-pill status-blue">Domínio Próprio</span></td>
+                  <td><span style="color: var(--danger); font-weight:600;"><i class="fas fa-times"></i> Erro NS</span></td>
+                  <td><span style="color: var(--warning); font-weight:600;"><i class="fas fa-spinner"></i> Pendente DNS</span></td>
+                  <td><button class="btn btn-outline btn-sm"><i class="fas fa-sync"></i> Re-checar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    else if (viewId === 'config') {
+      pageTitle.innerText = 'Configurações Globais do Sistema';
+      pageSubtitle.innerText = 'Parâmetros de negócio, APIs e integrações do SaaS.';
+      container.innerHTML = `
+        <div class="config-grid">
+          <div class="card-modern config-card">
+            <div class="config-icon" style="background: rgba(37,99,235,0.1); color: var(--primary);"><i class="fas fa-money-check-alt"></i></div>
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Mercado Pago API</h3>
+            <div class="form-group">
+              <label>Access Token (Produção)</label>
+              <input type="password" class="form-control" value="APP_USR-123456789-XXXXX">
+            </div>
+            <div class="form-group">
+              <label>Webhook URL (Para MP)</label>
+              <input type="text" class="form-control" value="https://api.tvloja.com.br/webhooks/mp" readonly>
+            </div>
+            <button class="btn btn-outline" style="width: 100%;">Testar Conexão</button>
+          </div>
+
+          <div class="card-modern config-card">
+            <div class="config-icon" style="background: rgba(16,185,129,0.1); color: var(--success);"><i class="fab fa-whatsapp"></i></div>
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Notificações e E-mail</h3>
+            <div class="form-group">
+              <label>Evolution API (WhatsApp) URL</label>
+              <input type="text" class="form-control" value="http://wpp.tvloja.com.br">
+            </div>
+            <div class="form-group">
+              <label>SMTP Host (E-mail)</label>
+              <input type="text" class="form-control" value="smtp.sendgrid.net">
+            </div>
+            <button class="btn btn-outline" style="width: 100%;">Salvar Integrações</button>
+          </div>
+
+          <div class="card-modern config-card">
+            <div class="config-icon" style="background: rgba(245,158,11,0.1); color: var(--warning);"><i class="fas fa-file-invoice"></i></div>
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Regras Financeiras</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label>Carência (Dias)</label>
+                <input type="number" class="form-control" value="5">
+              </div>
+              <div class="form-group">
+                <label>Multa Fixa (R$)</label>
+                <input type="text" class="form-control" value="2,00">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Juros ao Mês (%)</label>
+              <input type="text" class="form-control" value="1,00">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;">Atualizar Regras</button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Lógica do Gráfico Chart.js (MRR)
+  function initChart() {
+    const canvas = document.getElementById('mrrChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const isDark = body.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+
+    if (myChart) myChart.destroy();
+    
+    myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+          label: 'MRR (R$)',
+          data: [9800, 10500, 11200, 12800, 13400, 14520],
+          borderColor: '#2563eb', // Azul Admin
+          backgroundColor: 'rgba(37,99,235,0.1)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointBackgroundColor: '#2563eb'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: false, grid: { color: gridColor }, ticks: { color: textColor, callback: function(value) { return 'R$ ' + value; } } },
+          x: { grid: { display: false }, ticks: { color: textColor } }
+        }
+      }
+    });
+  }
+
+  // Navegação Global SPA
+  function simulateNav(view) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    if (window.innerWidth <= 900) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    renderView(view);
+  }
+
+  document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+    item.addEventListener('click', () => {
+      const view = item.getAttribute('data-view');
+      simulateNav(view);
+    });
+  });
+
+  // Inicializa o app
+  renderView('dashboard');
+</script>
+
+</body>
+</html>
